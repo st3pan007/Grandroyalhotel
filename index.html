@@ -472,283 +472,133 @@
         </div>
     </footer>
 
-    
-
-<!-- Custom Chat Widget -->
-<div id="chatWidget" class="fixed bottom-6 right-6 z-50">
-    <!-- Chat Button -->
-    <button id="chatButton" onclick="toggleChat()" class="w-16 h-16 bg-yellow-600 hover:bg-yellow-700 text-white rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 flex items-center justify-center">
-        <i data-lucide="message-circle" class="w-7 h-7"></i>
-    </button>
-    
-    <!-- Chat Window -->
-    <div id="chatWindow" class="hidden absolute bottom-20 right-0 w-96 h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 p-5 text-white">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                        <i data-lucide="sparkles" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg">Anna - AI Concierge</h3>
-                        <p class="text-sm opacity-90">Online 24/7</p>
-                    </div>
-                </div>
-                <button onclick="toggleChat()" class="hover:bg-white/20 p-2 rounded-full transition-colors">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Messages Area -->
-        <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50">
-            <!-- Welcome message will be added by JavaScript -->
-        </div>
-        
-        <!-- Input Area -->
-        <div class="p-4 border-t bg-white">
-            <form id="chatForm" class="flex items-center space-x-3">
-                <input 
-                    type="text" 
-                    id="chatInput" 
-                    placeholder="Napište zprávu..." 
-                    class="flex-1 px-4 py-3 border rounded-full focus:outline-none focus:border-yellow-600 transition-colors"
-                    autocomplete="off"
-                >
-                <button type="submit" class="w-12 h-12 bg-yellow-600 hover:bg-yellow-700 text-white rounded-full flex items-center justify-center transform hover:scale-105 transition-all">
-                    <i data-lucide="send" class="w-5 h-5"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Chat Widget Script -->
-<script>
-// Chat configuration
-const WEBHOOK_URL = 'https://n8n.srv968019.hstgr.cloud/webhook/78fd8325-3ae5-4bc6-b469-2d0dea434e8a/chat';
-const WELCOME_MESSAGE = 'Ahoj, jsem Anna, digitální recepční hotelu Grand Royal, jak vám mohu pomoci?';
-
-// Generate unique session ID
-const sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
-
-// Initialize chat state
-let isChatOpen = false;
-
-// Toggle chat window
-function toggleChat() {
-    const chatWindow = document.getElementById('chatWindow');
-    const chatButton = document.getElementById('chatButton');
-    
-    isChatOpen = !isChatOpen;
-    
-    if (isChatOpen) {
-        chatWindow.classList.remove('hidden');
-        chatButton.classList.add('scale-0');
-        
-        // Add welcome message if it's the first time opening
-        if (!chatWindow.dataset.initialized) {
-            addMessage(WELCOME_MESSAGE, 'bot');
-            chatWindow.dataset.initialized = 'true';
-        }
-        
-        // Focus on input
-        document.getElementById('chatInput').focus();
-    } else {
-        chatWindow.classList.add('hidden');
-        chatButton.classList.remove('scale-0');
-    }
-}
-
-// Add message to chat
-function addMessage(text, sender = 'user') {
-    const messagesContainer = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    
-    messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} chat-animation`;
-    
-    const messageBubble = document.createElement('div');
-    messageBubble.className = `max-w-[70%] px-4 py-3 rounded-2xl ${
-        sender === 'user' 
-            ? 'bg-yellow-600 text-white rounded-br-sm' 
-            : 'bg-white text-gray-800 rounded-bl-sm shadow-md'
-    }`;
-    messageBubble.textContent = text;
-    
-    messageDiv.appendChild(messageBubble);
-    messagesContainer.appendChild(messageDiv);
-    
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// Show typing indicator
-function showTypingIndicator() {
-    const messagesContainer = document.getElementById('chatMessages');
-    const typingDiv = document.createElement('div');
-    typingDiv.id = 'typingIndicator';
-    typingDiv.className = 'flex justify-start chat-animation';
-    typingDiv.innerHTML = `
-        <div class="bg-white text-gray-800 px-4 py-3 rounded-2xl rounded-bl-sm shadow-md">
-            <div class="flex space-x-2">
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-            </div>
-        </div>
-    `;
-    messagesContainer.appendChild(typingDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// Remove typing indicator
-function removeTypingIndicator() {
-    const typingIndicator = document.getElementById('typingIndicator');
-    if (typingIndicator) {
-        typingIndicator.remove();
-    }
-}
-
-// Send message to webhook
-async function sendMessage(message) {
-    try {
-        showTypingIndicator();
-        
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                sessionId: sessionId,
+    <!-- Chat Widget Configuration -->
+    <script>
+        window.ChatWidgetConfig = {
+            webhook: {
+                url: 'https://n8n.srv968019.hstgr.cloud/webhook/78fd8325-3ae5-4bc6-b469-2d0dea434e8a/chat',
                 route: 'general'
-            })
-        });
-        
-        removeTypingIndicator();
-        
-        if (response.ok) {
-            const data = await response.json();
-            // Handle different response formats
-            const botMessage = data.message || data.text || data.response || 'Omlouvám se, něco se pokazilo. Zkuste to prosím znovu.';
-            addMessage(botMessage, 'bot');
-        } else {
-            addMessage('Omlouvám se, momentálně mám technické potíže. Zkuste to prosím za chvíli.', 'bot');
+            },
+            branding: {
+                logo: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop',
+                name: 'Anna - AI Concierge',
+                welcomeText: 'Ahoj, jsem Anna, digitální recepční hotelu Grand Royal, jak vám mohu pomoci?',
+                responseTimeText: 'Jsme online 24/7, napište nám.'
+            },
+            style: {
+                primaryColor: '#d4af37',
+                secondaryColor: '#1e3a5f',
+                position: 'right',
+                backgroundColor: '#ffffff',
+                fontColor: '#1f2937'
+            }
+        };
+    </script>
+
+    <!-- Chat Widget Script -->
+    <script src="https://cdn.jsdelivr.net/gh/st3pan007/Grandroyalhotel@main/chat-widget.js"></script>
+
+    <!-- Page Scripts -->
+    <script>
+        // Handle predefined messages
+        function openChatWithMessage(message) {
+            // This function will be handled by the chat widget
+            if (window.chatWidgetLoaded && typeof window.openChat === 'function') {
+                window.openChat(message);
+            } else {
+                // Fallback - wait for widget to load
+                setTimeout(() => openChatWithMessage(message), 500);
+            }
         }
-    } catch (error) {
-        removeTypingIndicator();
-        console.error('Chat error:', error);
-        addMessage('Omlouvám se, momentálně mám potíže s připojením. Zkuste to prosím za chvíli.', 'bot');
-    }
-}
 
-// Handle form submission
-document.getElementById('chatForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    
-    if (message) {
-        addMessage(message, 'user');
-        input.value = '';
-        await sendMessage(message);
-    }
-});
+        // Toggle chat function
+        function toggleChat() {
+            // This will be handled by the chat widget
+            if (window.chatWidgetLoaded && typeof window.toggleChatWindow === 'function') {
+                window.toggleChatWindow();
+            }
+        }
 
-// Handle predefined messages
-function openChatWithMessage(message) {
-    if (!isChatOpen) {
-        toggleChat();
-    }
-    setTimeout(() => {
-        document.getElementById('chatInput').value = message;
-        document.getElementById('chatInput').focus();
-    }, 300);
-}
+        // Update all Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
 
-// Update all Lucide icons
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-});
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        });
 
-// Mobile menu toggle
-document.getElementById('mobileMenuToggle').addEventListener('click', () => {
-    const mobileMenu = document.getElementById('mobileMenu');
-    mobileMenu.classList.toggle('hidden');
-});
+        // Dark mode toggle
+        let isDarkMode = false;
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark');
+            
+            // Update icon
+            const icon = document.querySelector('#darkModeToggle i');
+            icon.setAttribute('data-lucide', isDarkMode ? 'moon' : 'sun');
+            lucide.createIcons();
+        });
 
-// Dark mode toggle
-let isDarkMode = false;
-document.getElementById('darkModeToggle').addEventListener('click', () => {
-    isDarkMode = !isDarkMode;
-    document.body.classList.toggle('dark');
-    
-    // Update icon
-    const icon = document.querySelector('#darkModeToggle i');
-    icon.setAttribute('data-lucide', isDarkMode ? 'moon' : 'sun');
-    lucide.createIcons();
-});
+        // Generate room cards
+        const rooms = [
+            {
+                name: 'Deluxe Room',
+                price: '5,999 Kč',
+                image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=300&fit=crop',
+                features: ['King Size postel', 'Výhled na město', 'Minibar']
+            },
+            {
+                name: 'Executive Suite',
+                price: '12,999 Kč',
+                image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=300&fit=crop',
+                features: ['Oddělený obývací pokoj', 'Jacuzzi', 'Terasa']
+            },
+            {
+                name: 'Presidential Suite',
+                price: '25,999 Kč',
+                image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop',
+                features: ['3 ložnice', 'Privátní kuchyň', 'Butler service']
+            }
+        ];
 
-// Generate room cards
-const rooms = [
-    {
-        name: 'Deluxe Room',
-        price: '5,999 Kč',
-        image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=300&fit=crop',
-        features: ['King Size postel', 'Výhled na město', 'Minibar']
-    },
-    {
-        name: 'Executive Suite',
-        price: '12,999 Kč',
-        image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=300&fit=crop',
-        features: ['Oddělený obývací pokoj', 'Jacuzzi', 'Terasa']
-    },
-    {
-        name: 'Presidential Suite',
-        price: '25,999 Kč',
-        image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&h=300&fit=crop',
-        features: ['3 ložnice', 'Privátní kuchyň', 'Butler service']
-    }
-];
+        const roomsContainer = document.querySelector('#rooms .grid');
+        rooms.forEach(room => {
+            const roomCard = document.createElement('div');
+            roomCard.className = 'bg-white rounded-lg overflow-hidden luxury-shadow transform hover:scale-105 transition-all duration-300';
+            roomCard.innerHTML = `
+                <img src="${room.image}" alt="${room.name}" class="w-full h-64 object-cover" loading="lazy">
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold mb-2">${room.name}</h3>
+                    <p class="text-3xl font-bold text-yellow-600 mb-4">${room.price}<span class="text-sm text-gray-600">/noc</span></p>
+                    <ul class="space-y-2 mb-6">
+                        ${room.features.map(feature => `
+                            <li class="flex items-center text-gray-600">
+                                <i data-lucide="check" class="w-5 h-5 text-yellow-600 mr-2"></i>
+                                ${feature}
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <button onclick="openChatWithMessage('Zajímá mě ${room.name}')" 
+                            class="w-full px-6 py-3 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors">
+                        Více informací
+                    </button>
+                </div>
+            `;
+            roomsContainer.appendChild(roomCard);
+        });
 
-const roomsContainer = document.querySelector('#rooms .grid');
-rooms.forEach(room => {
-    const roomCard = document.createElement('div');
-    roomCard.className = 'bg-white rounded-lg overflow-hidden luxury-shadow transform hover:scale-105 transition-all duration-300';
-    roomCard.innerHTML = `
-        <img src="${room.image}" alt="${room.name}" class="w-full h-64 object-cover" loading="lazy">
-        <div class="p-6">
-            <h3 class="text-2xl font-bold mb-2">${room.name}</h3>
-            <p class="text-3xl font-bold text-yellow-600 mb-4">${room.price}<span class="text-sm text-gray-600">/noc</span></p>
-            <ul class="space-y-2 mb-6">
-                ${room.features.map(feature => `
-                    <li class="flex items-center text-gray-600">
-                        <i data-lucide="check" class="w-5 h-5 text-yellow-600 mr-2"></i>
-                        ${feature}
-                    </li>
-                `).join('')}
-            </ul>
-            <button onclick="openChatWithMessage('Zajímá mě ${room.name}')" 
-                    class="w-full px-6 py-3 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors">
-                Více informací
-            </button>
-        </div>
-    `;
-    roomsContainer.appendChild(roomCard);
-});
-
-// Refresh Lucide icons after dynamic content
-setTimeout(() => {
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-}, 100);
-</script>
+        // Refresh Lucide icons after dynamic content
+        setTimeout(() => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }, 100);
+    </script>
 
 </body>
 </html>
